@@ -41,6 +41,7 @@ INSTALLED_APPS = (
 
 OUR_APPS = (
     'steamauth',
+    'tournament'
 )
 
 INSTALLED_APPS += OUR_APPS
@@ -114,6 +115,7 @@ AUTHENTICATION_BACKENDS = (
     'steamauth.backends.SteamOpenIDBackend',
 )
 
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 STEAM_PROVIDER_URL = "http://steamcommunity.com/openid"
 
 LOGIN_REDIRECT_URL = '/'
