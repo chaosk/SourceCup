@@ -1,0 +1,39 @@
+{% extends 'tournament/tournament_details.html' %}
+{% block title %}Teams &gt; {{ block.super }}{% endblock %}
+{% block tournament_content %}
+					<table class="table table-bordered">
+						<thead>
+							<tr>
+								<th>Rank</th>
+								<th>Team name <small class="muted">Team tag</small></th>
+								<th>Points</th>
+								<th rel="tooltip" title="Match points">MP</th>
+								<th rel="tooltip" title="Matches played">M</th>
+								<th rel="tooltip" title="Default losses">DL</th>
+								<th>Wins</th>
+								<th>Loss</th>
+								<th rel="tooltip" title="Match points for">Mp+</th>
+								<th rel="tooltip" title="Match points against">Mp-</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for tt in tts %}
+							<tr>
+								<td{% if not tt.is_alive %} class="muted"{% endif %}>{{ forloop.counter }}</td>
+								<td><a href="{{ tt.team.get_absolute_url }}">{{ tt.team }}</a> <small class="muted">{{ tt.team.tag }}</small></td>
+								{#<td><strong>{{ tt.ladder_points }}</strong></td>
+								<td>{{ tt.match_points }}</td>
+								<td>{{ tt.matches_played }}</td>
+								<td>{{ tt.forfeits }}</td>
+								<td>{{ tt.ladder_points_won }}</td>
+								<td>{{ tt.ladder_points_lost }}</td>
+								<td>{{ tt.match_points_won }}</td>
+								<td>{{ tt.match_points_lost }}</td>#}
+							</tr>
+							{% empty %}
+							<tr>
+								<td colspan="10">No teams found!</td>
+							</tr>
+							{% endfor %}
+					</table>
+{% endblock %}

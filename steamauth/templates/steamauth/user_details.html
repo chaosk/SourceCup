@@ -1,0 +1,27 @@
+{% extends 'steamauth/user_list.html' %}
+{% block title %}{{ auser }} &gt; {{ block.super }}{% endblock %}
+{% block content %}
+				<div class="col-md-9">
+					<div class="row">
+						<div class="page-header">
+							<span class="pull-right"><div class="btn-group">{% if user.is_authenticated %}<a class="btn" rel="tooltip" title="Requires an open Steam window" href="steam://friends/add/{{ auser.steamid }}">Add on Steam</a>{% endif %}</div></span>
+							<h1><img src="{{ auser.avatar }}" /> {{ auser }}<small>{% if auser.is_staff %} <span class="label label-{{ auser.is_hero|yesno:'important,info' }}">Staff</span>{% endif %}{% if not auser.is_active %} <span class="label label-important">Suspended</span>{% endif %}</small></h1>
+						</div>
+						<dl class="dl-horizontal">
+							{% if auser.profile_url %}
+							<dt>Vanity URL</dt>
+							<dd><a href="{{ auser.profile_url }}">{{ auser.profile_url }}</a></dd>
+							{% endif %}
+							<dt>SteamID64</dt>
+							<dd>{{ auser.steamid }}</dd>
+							<dt>SteamID32</dt>
+							<dd>{{ auser.steamid32 }}</dd>
+							<dt>Teams</dt>
+							<dd>{% for team in auser.teams.all %}<a href="{{ team.get_absolute_url }}">{{ team }}</a> {% empty %}Not associated with any team{% endfor %}</dd>
+						</dl>
+					</div>
+					<div class="row">
+						
+					</div>
+				</div><!--/span-->
+{% endblock %}

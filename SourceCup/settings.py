@@ -32,16 +32,20 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = (
     'django.contrib.admin',
-    'django.contrib.auth',
+    'SourceCup.apps.ContribAuthConfig',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'compressor',
+    'autocomplete_light',
+    'gitrevision',
 )
 
 OUR_APPS = (
+    'SourceCup',
     'steamauth',
-    'tournament'
+    'tournament',
 )
 
 INSTALLED_APPS += OUR_APPS
@@ -70,6 +74,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.core.context_processors.csrf',
+                'gitrevision.context_processors.gitrevision',
             ],
         },
     },
@@ -107,6 +113,17 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+COMPRESS_OUTPUT_DIR = 'cached'
+COMPRESS_STORAGE = 'compressor.storage.GzipCompressorFileStorage'
+
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder',
+)
 
 # Steam OpenID-based authentication.
 AUTH_USER_MODEL = 'steamauth.SteamUser'

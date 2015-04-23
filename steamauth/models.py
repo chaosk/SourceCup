@@ -67,13 +67,11 @@ class SteamUser(AbstractBaseUser):
 	LEVEL_SUPERHERO = 9
 	LEVEL_JUSTAHERO = 6
 	LEVEL_SIDEKICK = 3
-	LEVEL_CASTER = 2
 	LEVEL_USER = 1
 	LEVEL_CHOICES = (
 		(LEVEL_SUPERHERO, "Owner"),
 		(LEVEL_JUSTAHERO, "Admin"),
 		(LEVEL_SIDEKICK, "Helper"),
-		(LEVEL_CASTER, "Caster"),
 		(LEVEL_USER, "User"),
 	)
 	level = models.PositiveSmallIntegerField(choices=LEVEL_CHOICES,
@@ -88,8 +86,7 @@ class SteamUser(AbstractBaseUser):
 		ordering = ['created_at']
 
 	def get_absolute_url(self):
-		return reverse('user_details',
-			args=[str(self.steamid)])
+		return reverse('user_details', args=[str(self.steamid)])
 
 	def get_team(self):
 		return self.teams.latest('id')

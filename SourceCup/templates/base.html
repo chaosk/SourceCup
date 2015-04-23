@@ -1,0 +1,127 @@
+{% load compress %}
+{% load static %}
+{% load current from navigation %}
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>{% block title %}SourceCup{% endblock %}</title>
+		{% compress css %}
+		<link href="{% static 'SourceCup/css/bootstrap.min.css' %}" rel="stylesheet">
+		<link href="{% static 'SourceCup/css/bootstrap-theme.min.css' %}" rel="stylesheet">
+		<link href="{% static 'SourceCup/css/SourceCup.css' %}" rel="stylesheet">
+		<link rel="stylesheet" type="text/css" href="{% static 'autocomplete_light/style.css' %}" />
+		{% endcompress %}
+
+		<!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+		<!--[if lt IE 9]>
+			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+	</head>
+
+	<body id="{% block bodyid %}default{% endblock %}">
+		<nav class="navbar navbar-inverse navbar-fixed-top">
+			<div class="container">
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+						<span class="sr-only">Toggle navigation</span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+					<a class="navbar-brand" href="{% url 'home' %}" title="SourceCup">SourceCup</a>
+				</div>
+				<div id="navbar" class="navbar-collapse collapse">
+					<ul class="nav navbar-nav">
+						<li class="{% current 'home' %}"><a href="{% url 'home' %}">Home</a></li>
+						<li class="{% current 'tournament_list' %}"><a href="{% url 'tournament_list' %}">Tournaments</a></li>
+					</ul>
+					{% if user.is_authenticated %}
+					<ul class="nav navbar-nav navbar-right">
+						<div class="navbar-form pull-left">
+							<input type="text" name="q" class="search-query form-control" id="navigation_autocomplete" autofocus>
+						</div>
+						<li class="dropdown">
+							<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+								<img class="avatar-small" src="{{ user.avatar }}"> {{ user }}
+							</a>
+							<ul class="dropdown-menu">
+								{% if user.is_staff %}<li><a href="{% url 'admin:index' %}">Admin Site</a></li>
+								<li class="divider"></li>{% endif %}
+								<li><a href="{{ user.get_absolute_url }}">Site Profile</a></li>
+								<li><a href="{{ user.profile_url }}">Steam Profile</a></li>
+								<li><a href="{% url 'signout' %}">Sign Out</a></li>
+							</ul>
+						</li>
+					</ul>
+					{% else %}
+					<ul class="nav navbar-nav navbar-right">
+						<li>
+							<a href="{% url 'signin' %}?next={{ request.path_info }}"><img id="openid" src="{% static 'SourceCup/img/steamopenid.png' %}" alt="Sign in through Steam"></a>
+						</li>
+					</div>
+					{% endif %}
+				</div><!--/.nav-collapse -->
+			</div>
+		</nav>
+
+		<div class="container">
+			<div class="row">
+				{% block sidebar %}
+
+				{% endblock %}
+
+				{% if messages|length %}
+				<div class="col-md-9" id="messages">
+				{% for message in messages %}
+					<div id="message-{{ message.pk }}" {% if message.tags %} class="alert alert-{{ message.tags }}"{% endif %}>
+						<button class="message-close close" data-href="#">&times;</button>
+						{% if message.subject %}<strong>{{ message.subject }}</strong> {% endif %}{{ message.message|safe }}
+					</div>
+				{% endfor %}
+					{% if messages|length > 1 %}
+					<a class="message-close-all btn btn-default pull-right" href="#"><span>close all</span></a>
+					{% endif %}
+				</div>
+				{% endif %}
+				{% if request.breadcrumbs|length > 1 %}
+				<ul class="breadcrumb col-md-9">
+				{% for breadcrumb in request.breadcrumbs %}
+					{% if not forloop.last %}
+					{% if breadcrumb.url %}<li><a href="{{ breadcrumb.url }}">{{ breadcrumb.name }}</a>{% else %}<li class="active">{{ breadcrumb.name }}{% endif %} <span class="divider">/</span></li>
+					{% else %}
+					<li class="active">{{ breadcrumb.name }}</li>
+					{% endif %}
+				{% endfor %}
+				</ul>
+				{% endif %}
+				{% block content %}
+				{% endblock %}
+			</div><!--/row-->
+
+			<hr>
+
+			<footer>
+
+				<p class="pull-right">
+					<span class="glyphicon glyphicon-time" aria-hidden="true"></span> {% now 'd M Y H:i O \G\M\T' %}<br>
+					<span class="pull-right">Running {{ GIT_REVISION|slice:'7' }}</span>
+				</p>
+				<p>
+					Powered by <a href="http://steampowered.com">Steam</a> Web API. Designed with <a href="http://twitter.github.com/bootstrap">Bootstrap</a>.
+				</p>
+			</footer>
+
+		</div><!--/.fluid-container-->
+
+		{% compress js %}
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+		<script src="{% static 'SourceCup/js/bootstrap.min.js' %}"></script>
+		{% include 'autocomplete_light/static.html' %}
+		<script src="{% static 'SourceCup/js/SourceCup.js' %}"></script>
+		{% endcompress %}
+		{% block extra_js %}{% endblock %}
+	</body>
+</html>

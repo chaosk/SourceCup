@@ -1,0 +1,32 @@
+{% extends 'tournament/tournament_details.html' %}
+{% block title %}Fixtures &gt; {{ block.super }}{% endblock %}
+{% load round_name from tournament_utils %}
+{% block tournament_content %}
+{% if around %}
+					<h3>{% round_name round tournament %} <small>{{ round.map }}, {{ round.starts_at }} - {{ round.ends_at }}</small></h3>
+					<table class="table table-bordered table-fixed">
+						<thead>
+							<tr>
+								<th class="column40">Team 1</th>
+								<th class="column40">Team 2</th>
+								<th class="column10">Match</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for match in matches %}
+							<tr>
+								{% for tt in match.tts.all %}
+								<td>{{ tt.team }}{% if match.home_tt == tt %} <small>(home)</small>{% endif %}</td>
+								{% endfor %}
+								<td><a class="btn btn-mini" href="{{ match.get_absolute_url }}">Go to match <i class="icon-share-alt"></i></a></td>
+							</tr>
+							{% empty %}
+							<tr>
+								<td colspan="3">No fixtures found!</td>
+							</tr>
+							{% endfor %}
+					</table>
+{% else %}
+					<h3>No fixtures available</h3>
+{% endif %}
+{% endblock %}

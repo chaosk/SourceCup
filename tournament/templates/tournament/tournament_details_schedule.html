@@ -1,0 +1,37 @@
+{% extends 'tournament/tournament_details.html' %}
+{% load current from navigation %}
+{% load round_name from tournament_utils %}
+{% block title %}Schedule &gt; {{ block.super }}{% endblock %}
+{% block tournament_content %}
+					{% regroup rounds by get_round_type_display as types %}
+					<table class="table table-bordered">
+						<thead>
+							<tr>
+								<th>Round</th>
+								<th>Map</th>
+								<th>Starts at</th>
+								<th>Ends at</th>
+							</tr>
+						</thead>
+						<tbody>
+						{% with current_round=tournament.current_round %}
+						{% for type in types %}
+							<tr class="info">
+								<td colspan="4">{{ type.grouper }}</td>
+							</tr>
+							{% for round in type.list %}
+							<tr{% if round.has_ended %} class="muted"{% endif %}{% if current_round == round %} class="success"{% endif %}>
+								<td>{% round_name round tournament %}</td>
+								<td>{{ round.map }}</td>
+								<td>{{ round.starts_at }}</td>
+								<td>{{ round.ends_at }}</td>
+							</tr>
+							{% empty %}
+							<tr>
+								<td colspan="4">No rounds found!</td>
+							</tr>
+							{% endfor %}
+						{% endfor %}
+						{% endwith %}
+					</table>
+{% endblock %}

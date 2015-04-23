@@ -1,0 +1,54 @@
+{% extends 'tournament/tournament_details.html' %}
+{% load current from navigation %}
+{% load round_name from tournament_utils %}
+{% block title %}{% if round %}{% round_name round tournament %} &gt; {% endif %}Results &gt; {{ block.super }}{% endblock %}
+{% block tournament_content %}
+					<ul class="nav nav-tabs">
+						{% for around in rounds %}
+						<li class="{% if not around.has_started %}disabled{% endif %}{% current 'tournament_details_results' slug=tournament.slug round_number=around.number %}">{% if around.has_started %}<a href="{% url 'tournament_details_results' slug=tournament.slug round_number=around.number %}">{% round_name around tournament %}</a>{% else %}<a>{% round_name around tournament %}</a>{% endif %}</li>
+						{% endfor %}
+					</ul>
+					{% if round %}
+					{% regroup results by match.get_status_display as states %}
+					<h3>{% round_name round tournament %} <small>{{ round.played_map }}, {{ round.starts_at }} - {{ round.ends_at }}</small></h3>
+					<table class="table table-bordered table-fixed">
+						<thead>
+							<tr>
+								<th class="column30">Home team</th>
+								<th colspan="2" class="column10">Score</th>
+								<th class="column30">Away team</th>
+								<th class="column10">Match</th>
+							</tr>
+						</thead>
+						<tbody>
+						{% for state in states %}
+							<tr class="info">
+								<td colspan="5">{{ state.grouper }}</td>
+							</tr>
+							{% for result in state.list %}
+							<tr>
+								<td>{{ result.tt.team }}</td>
+								{% if result.match.status == result.match.STATUS_ACCEPTED or result.match.status == result.match.STATUS_RESOLVED %}
+								<td>{{ result.score }}</td>
+								<td>{{ result.opponents_score }}</td>
+								<td>{{ result.opponent }}</td>
+								{% else %}
+								{% if result.match.status == result.match.STATUS_BYE %}
+								<td colspan="2">-</td>
+								<td>{{ result.match.get_status_display }}</td>
+								{% else %}
+								<td colspan="2">{% if result.match.status == result.match.STATUS_DEFAULTLOSS %}-{% else %}TBA{% endif %}</td>
+								<td>{{ result.opponent }}</td>
+								{% endif %}
+								{% endif %}
+								<td><a class="btn btn-mini" href="{{ result.match.get_absolute_url }}">Go to match <i class="icon-share-alt"></i></a></td>
+							</tr>
+							{% empty %}
+							<tr>
+								<td colspan="5">No matches found!</td>
+							</tr>
+							{% endfor %}
+						{% endfor %}
+					</table>
+					{% endif %}
+{% endblock %}

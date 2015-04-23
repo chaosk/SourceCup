@@ -1,0 +1,29 @@
+{% extends 'tournament/tournament_list.html' %}
+{% load current from navigation %}
+{% block title %}{{ tournament }} &gt; {{ block.super }}{% endblock %}
+{% block bodyid %}tournament-details{% endblock %}
+{% block content %}
+				<div class="col-md-9">
+					<div class="row">
+						<div class="page-header">
+							<h1>{{ tournament }}</h1>
+						</div>
+						<dl class="dl-horizontal">
+							<dt>Ladder length</dt>
+							<dd>{{ tournament.season.ladder_rounds }} week{{ tournament.season.ladder_rounds|pluralize }}</dd>
+							<dt>Play-offs length</dt>
+							<dd>{{ tournament.season.playoff_rounds }} week{{ tournament.season.ladder_rounds|pluralize }}</dd>
+							<dt>Participants</dt>
+							<dd>{{ tournament.team_entries.count }}</dd>
+						</dl>
+					</div>
+					<ul class="nav nav-tabs">
+						<li class="{% current 'tournament_details' slug=tournament.slug page='teams' %}"><a href="{% url 'tournament_details' slug=tournament.slug page='teams' %}">Teams</a></li>
+						<li class="{% current 'tournament_details' slug=tournament.slug page='schedule' %}"><a href="{% url 'tournament_details' slug=tournament.slug page='schedule' %}">Schedule</a></li>
+						<li class="{% current 'tournament_details' slug=tournament.slug page='results' %}"><a href="{% url 'tournament_details' slug=tournament.slug page='results' %}">Results</a></li>
+						<li class="{% current 'tournament_details_fixtures' slug=tournament.slug %}"><a href="{% url 'tournament_details_fixtures' slug=tournament.slug %}">Fixtures</a></li>
+						<li class="{% current 'tournament_details' slug=tournament.slug page='staff' %}"><a href="{% url 'tournament_details' slug=tournament.slug page='staff' %}">Staff</a></li>
+					</ul>
+					{% block tournament_content %}{% endblock %}
+				</div><!--/span-->
+{% endblock %}

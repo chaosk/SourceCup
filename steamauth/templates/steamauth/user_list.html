@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Users &gt; {{ block.super }}{% endblock %}
+{% block bodyid %}user-list{% endblock %}
+{% block content %}
+				<div class="col-md-9">
+					<table class="table table-bordered">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>Username</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for auser in users %}
+							<tr>
+								<td>{{ auser.id }}</td>
+								<td><a href="{{ auser.get_absolute_url }}">{{ auser }}</a>{% if auser.is_staff %} <span class="label label-{{ auser.is_hero|yesno:'important,info' }}">Staff</span>{% endif %}</td>
+								<td>{{ auser.email|default:'-' }}</td>
+							</tr>
+							{% empty %}
+							<tr>
+								<td colspan="2">No users found!</td>
+							</tr>
+							{% endfor %}
+					</table>
+				</div><!--/span-->
+{% endblock %}

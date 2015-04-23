@@ -2,3 +2,7 @@ Django>=1.8
 requests
 celery
 python3-openid
+django-autocomplete-light
+django-compressor
+django-gitrevision
+linaro-django-pagination

@@ -1,5 +1,5 @@
 import re
-import urllib
+import urllib.parse
 
 from django.conf import settings
 from django.contrib import messages
@@ -9,7 +9,7 @@ from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.template.response import TemplateResponse
 from django.views.decorators.csrf import csrf_exempt
 
@@ -86,7 +86,7 @@ def login_begin(request):
 			return_to += '&'
 		else:
 			return_to += '?'
-		return_to += urllib.urlencode({REDIRECT_FIELD_NAME: redirect_to})
+		return_to += urllib.parse.urlencode({REDIRECT_FIELD_NAME: redirect_to})
 
 	trust_root = request.build_absolute_uri('/')
 
@@ -140,4 +140,8 @@ def logout(request):
 
 
 def user_details(request, steamid):
-	...
+	user = get_object_or_404(get_user_model(), steamid=steamid)
+
+	return render(request, 'steamauth/user_details.html', {
+		'auser': user,
+	})
