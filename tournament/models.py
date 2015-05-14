@@ -5,6 +5,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+from django.db.models import F, Sum
 
 
 class SnapshotException(Exception):
@@ -112,6 +113,9 @@ class Tournament(models.Model):
 	name = models.CharField(max_length=70)
 	short_name = models.CharField(max_length=50, blank=True)
 	slug = models.CharField(max_length=70, unique=True)
+
+	teams = models.ManyToManyField('Team', related_name='tournaments',
+		through='TeamEntry', blank=True)
 
 	class Meta:
 		unique_together = ('season', 'region')
@@ -301,14 +305,27 @@ class MatchResult(models.Model):
 
 
 class Team(models.Model):
+	created_at = models.DateTimeField(auto_now_add=True)
 	name = models.CharField(max_length=70)
 	tag = models.CharField(max_length=25)
 	leader = models.ForeignKey(settings.AUTH_USER_MODEL,
 		null=True, blank=True,
 		related_name='owned_teams', on_delete=models.SET_NULL)
+	is_active = models.BooleanField(default=True)
 
 	members = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='teams',
 		through='Membership', blank=True)
+
+	entry_code = models.CharField(max_length=25, blank=True)
+
+	def get_absolute_url(self):
+		return reverse('team_details', args=[self.pk])
+
+	def disband(self):
+		self.membership_set.update(left_at=timezone.now())
+		# @TODO Leave all ongoing tournaments the moment a team disbands
+		self.is_active = False
+		self.save()
 
 	def __str__(self):
 		return self.name
@@ -355,12 +372,12 @@ class TeamEntry(models.Model):
 	def ladder_points_won(self):
 		return self.results.filter(
 			match__status__in=(Match.STATUS_ACCEPTED, Match.STATUS_RESOLVED,
-				Match.STATUS_BYE, Match.STATUS_DEFAULTLOSS)).filter(is_victory=True).count()
+				Match.STATUS_BYE, Match.STATUS_DEFAULTLOSS)).filter().count()
 
 	def ladder_points_lost(self):
 		return self.results.filter(
 			match__status__in=(Match.STATUS_ACCEPTED, Match.STATUS_RESOLVED,
-				Match.STATUS_BYE, Match.STATUS_DEFAULTLOSS)).filter(is_victory=False).count()
+				Match.STATUS_BYE, Match.STATUS_DEFAULTLOSS)).filter().count()
 
 	@property
 	def match_points(self):
@@ -431,6 +448,26 @@ class Membership(models.Model):
 	team = models.ForeignKey(Team)
 	joined_at = models.DateTimeField(null=True, blank=True)
 	left_at = models.DateTimeField(null=True, blank=True)
+
+	class Meta:
+		ordering = ['joined_at']
+		get_latest_by = 'joined_at'
+
+	def leave(self):
+		if not self.left_at:
+			self.left_at = timezone.now()
+			self.save()
+
+	def save(self, *args, **kwargs):
+		created = not self.id
+		if created:
+			try:
+				previous_team = self.player.teams.latest()
+			except Team.DoesNotExit:
+				pass
+			else:
+				previous_team.membership.leave()
+		super().save(*args, **kwargs)
 
 	def __str__(self):
 		return "{} of {}".format(self.player, self.team)

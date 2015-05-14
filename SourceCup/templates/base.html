@@ -50,6 +50,13 @@
 							<ul class="dropdown-menu">
 								{% if user.is_staff %}<li><a href="{% url 'admin:index' %}">Admin Site</a></li>
 								<li class="divider"></li>{% endif %}
+								<li role="presentation" class="dropdown-header">Current team</li>
+								{% if user.current_team %}
+								<li><a href="{{ user.current_team.get_absolute_url }}">{{ user.current_team }}{% if user.current_team.leader == user %} <span class="label label-default">leader</span>{% endif %}</a></li>
+								{% else %}
+								<li><a href="{% url 'team_create' %}">None, create a team!</a></li>
+								{% endif %}
+								<li class="divider"></li>
 								<li><a href="{{ user.get_absolute_url }}">Site Profile</a></li>
 								<li><a href="{{ user.profile_url }}">Steam Profile</a></li>
 								<li><a href="{% url 'signout' %}">Sign Out</a></li>

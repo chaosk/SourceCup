@@ -1,7 +1,7 @@
 {% extends 'steamauth/user_list.html' %}
 {% block title %}{{ auser }} &gt; {{ block.super }}{% endblock %}
 {% block content %}
-				<div class="col-md-9">
+				<div class="col-md-12">
 					<div class="row">
 						<div class="page-header">
 							<span class="pull-right"><div class="btn-group">{% if user.is_authenticated %}<a class="btn" rel="tooltip" title="Requires an open Steam window" href="steam://friends/add/{{ auser.steamid }}">Add on Steam</a>{% endif %}</div></span>
@@ -16,12 +16,28 @@
 							<dd>{{ auser.steamid }}</dd>
 							<dt>SteamID32</dt>
 							<dd>{{ auser.steamid32 }}</dd>
-							<dt>Teams</dt>
-							<dd>{% for team in auser.teams.all %}<a href="{{ team.get_absolute_url }}">{{ team }}</a> {% empty %}Not associated with any team{% endfor %}</dd>
 						</dl>
 					</div>
 					<div class="row">
-						
+						<h3>Team history</h3>
+						<table class="table table-bordered">
+							<thead>
+								<tr>
+									<th>Team</th>
+									<th>Joined at</th>
+									<th>Left at</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for membership in auser.membership_set.all %}
+								<tr>
+									<td><a href="{{ membership.team.get_absolute_url }}">{{ membership.team }}</a></td>
+									<td>{{ membership.joined_at }}</td>
+									<td>{{ membership.left_at|default_if_none:"-" }}</td>
+								</tr>
+								{% endfor %}
+							</tbody>
+						</table>
 					</div>
 				</div><!--/span-->
 {% endblock %}

@@ -1,0 +1,117 @@
+{% extends 'tournament/team_list.html' %}
+{% block title %}{{ team }} &gt; {{ block.super }}{% endblock %}
+{% load round_name from tournament_utils %}
+{% block content %}
+				<div class="col-md-12">
+					<div class="row">
+						<div class="page-header">
+							<span class="pull-right">
+							{% if user.current_team == team %}
+							<a href="{% url 'team_leave' team.id %}" class="btn">Leave team</a>
+							{% endif %}
+							{% if user == team.leader %}
+							<a href="{% url 'team_disband' team.id %}" class="btn">Disband team</a>
+							<a href="{% url 'team_edit' team.id %}" class="btn">Modify details</a>
+							{% endif %}
+							{% if not user.current_team %}
+							<a href="{% url 'team_join' team.id %}">Join team</a>
+							{% endif %}
+							</span>
+							{#{% if user.is_staff %}<span class="pull-right"><a href="{% url 'team_edit' team.id %}" class="btn">Edit {% if user == team.leader %}your{% else %}this{% endif %} team</a></span>{% else %}{% if user == team.leader %}<span class="pull-right"><button rel="tooltip" title="If you wish to edit your team details, contact one of the admins through the &quot;Staff&quot; page." class="btn disabled">Edit your team</button></span>{% endif %}{% endif %}#}
+							<h1>{{ team }} <small>{{ team.tag }}</small></h1>
+						</div>
+						<dl class="dl-horizontal">
+							<dt>Created at</dt>
+							<dd>{{ team.created_at }}</dd>
+							<dt>Leader</dt>
+							<dd><a href="{{ team.leader.get_absolute_url }}">{{ team.leader }}</a></dd>
+						</dl>
+					</div>
+					<h4>Tournaments</h4>
+					{% for entry in team.entries.all %}
+					<h5><a href="{% url 'tournament_details' slug=entry.tournament.slug page='teams' %}">{{ entry.tournament }}</a>{% if entry.is_suspended %} <span class="label label-danger">Team suspended</span>{% endif %}</h5>
+					<table class="table table-bordered">
+						<thead>
+							<tr>
+								<th>Record</th>
+								<th>Points</th>
+								<th rel="tooltip" title="Match points">MP</th>
+								<th rel="tooltip" title="Matches played">M</th>
+								<th rel="tooltip" title="Default losses">DL</th>
+								<th>Wins</th>
+								<th>Loss</th>
+								<th rel="tooltip" title="Match points for">Mp+</th>
+								<th rel="tooltip" title="Match points against">Mp-</th>
+							</tr>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>{{ entry.team }}</td>
+								<td><strong>{{ entry.ladder_points }}</strong></td>
+								<td>{{ entry.match_points }}</td>
+								<td>{{ entry.matches_played }}</td>
+								<td>{{ entry.forfeits }}</td>
+								<td>{{ entry.ladder_points_won }}</td>
+								<td>{{ entry.ladder_points_lost }}</td>
+								<td>{{ entry.match_points_won }}</td>
+								<td>{{ entry.match_points_lost }}</td>
+							</tr>
+					</table>
+					<table class="table table-bordered">
+						<thead>
+							<tr>
+								<th>Round</th>
+								<th>Map</th>
+								<th>Opponent</th>
+								<th>Result</th>
+								<th colspan="2">Score</th>
+								<th>Match</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for result in entry.results.all %}
+							<tr>
+								<td>{% round_name result.match.round tt.tournament %}</td>
+								<td>{{ result.match.round.played_map }}</td>
+								<td>{% if result.match.status == result.match.STATUS_BYE %}Bye{% else %}<a href="{{ result.opponent.get_absolute_url }}">{{ result.opponent }}</a>{% endif %}</td>
+								<td>{% if result.match.status != result.match.STATUS_ACCEPTED and result.match.status != result.match.STATUS_RESOLVED and result.match.status != result.match.STATUS_BYE and result.match.status != result.match.STATUS_DEFAULTLOSS %}-{% else %}{% if result.is_win %}W{% if result.is_defaultwin %} (default){% endif %}{% else %}L{% if result.is_defaultloss %} (default){% endif %}{% endif %}{% endif %}</td>
+								{% if result.match.status == result.match.STATUS_ACCEPTED or result.match.status == result.match.STATUS_RESOLVED or result.match.status == result.match.STATUS_DEFAULTLOSS %}
+								<td>{{ result.score }}</td>
+								<td>{{ result.opponents_score }}</td>
+								{% else %}
+								<td colspan="2">{% if result.match.status == result.match.STATUS_BYE %}Bye{% else %}TBA{% endif %}</td>
+								{% endif %}
+								<td><a class="btn btn-mini" href="{{ result.match.get_absolute_url }}">Go to match <i class="icon-share-alt"></i></a></td>
+							</tr>
+							{% empty %}
+							<tr>
+								<td colspan="7">No matches found!</td>
+							</tr>
+							{% endfor %}
+					</table>
+					{% endfor %}
+
+					<h4>Players</h4>
+					<div class="col-md-12">
+						<table class="table table-bordered">
+							<thead>
+								<tr>
+									<th>Player</th>
+									<th>SteamID</th>
+									<th>Joined at</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for membership in team.membership_set.all %}
+								<tr>
+									<td><a href="{{ membership.player.get_absolute_url }}">{{ membership.player }}</a></td>
+									<td>{{ membership.player.steamid }}</td>
+									<td>{{ membership.joined_at }}</td>
+								</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+				</div>
+{% endblock %}

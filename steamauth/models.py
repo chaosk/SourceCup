@@ -4,6 +4,7 @@ from django.db import models
 from django.dispatch import receiver
 from django.contrib.auth.signals import user_logged_in
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
+from tournament.models import Team
 from .tasks import update_profiles
 from .utils import STEAMID_MAGIC, get_state_display
 from .utils import API_PERSONA_STATE_OFFLINE, API_PERSONA_STATE_BUSY
@@ -88,8 +89,13 @@ class SteamUser(AbstractBaseUser):
 	def get_absolute_url(self):
 		return reverse('user_details', args=[str(self.steamid)])
 
-	def get_team(self):
-		return self.teams.latest('id')
+	@property
+	def current_team(self):
+		try:
+			team = self.teams.get(membership__left_at__isnull=True)
+		except Team.DoesNotExist:
+			team = None
+		return team
 
 	def __str__(self):
 		return self.username or str(self.steamid)

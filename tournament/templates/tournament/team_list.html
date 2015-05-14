@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Teams &gt; {{ block.super }}{% endblock %}
+{% block bodyid %}team-list{% endblock %}
+{% block content %}
+				<div class="col-md-12">
+					<table class="table table-bordered">
+						<thead>
+							<tr>
+								<th>Team name</th>
+								<th>Tag</th>
+								<th>Leader</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for team in teams %}
+							<tr>
+								<td><a href="{{ team.get_absolute_url }}">{{ team.name }}</a></td>
+								<td>{{ team.tag }}</td>
+								<td><a href="{{ team.leader.get_absolute_url }}">{{ team.leader }}</a></td>
+							</tr>
+							{% empty %}
+							<tr>
+								<td colspan="4">No teams found!</td>
+							</tr>
+							{% endfor %}
+					</table>
+				</div><!--/span-->
+{% endblock %}

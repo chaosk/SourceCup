@@ -17,18 +17,18 @@
 							</tr>
 						</thead>
 						<tbody>
-							{% for tt in tts %}
+							{% for entry in team_entries %}
 							<tr>
-								<td{% if not tt.is_alive %} class="muted"{% endif %}>{{ forloop.counter }}</td>
-								<td><a href="{{ tt.team.get_absolute_url }}">{{ tt.team }}</a> <small class="muted">{{ tt.team.tag }}</small></td>
-								{#<td><strong>{{ tt.ladder_points }}</strong></td>
-								<td>{{ tt.match_points }}</td>
-								<td>{{ tt.matches_played }}</td>
-								<td>{{ tt.forfeits }}</td>
-								<td>{{ tt.ladder_points_won }}</td>
-								<td>{{ tt.ladder_points_lost }}</td>
-								<td>{{ tt.match_points_won }}</td>
-								<td>{{ tt.match_points_lost }}</td>#}
+								<td{% if not entry.is_alive %} class="muted"{% endif %}>{{ forloop.counter }}</td>
+								<td><a href="{{ entry.team.get_absolute_url }}">{{ entry.team }}</a> <small class="muted">{{ entry.team.tag }}</small></td>
+								{% comment %} <td><strong>{{ entry.ladder_points }}</strong></td>
+								<td>{{ entry.match_points }}</td>
+								<td>{{ entry.matches_played }}</td>
+								<td>{{ entry.forfeits }}</td>
+								<td>{{ entry.ladder_points_won }}</td>
+								<td>{{ entry.ladder_points_lost }}</td>
+								<td>{{ entry.match_points_won }}</td>
+								<td>{{ entry.match_points_lost }}</td> {% endcomment %}
 							</tr>
 							{% empty %}
 							<tr>

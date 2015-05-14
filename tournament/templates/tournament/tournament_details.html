@@ -3,9 +3,14 @@
 {% block title %}{{ tournament }} &gt; {{ block.super }}{% endblock %}
 {% block bodyid %}tournament-details{% endblock %}
 {% block content %}
-				<div class="col-md-9">
+				<div class="col-md-12">
 					<div class="row">
 						<div class="page-header">
+							<span class="pull-right">
+							{% if user.current_team.leader == user and user.current_team not in tournament.teams.all %}
+							<a href="{% url 'tournament_join' tournament.slug %}" class="btn">Join tournament</a>
+							{% endif %}
+							</span>
 							<h1>{{ tournament }}</h1>
 						</div>
 						<dl class="dl-horizontal">

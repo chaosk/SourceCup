@@ -1,4 +1,8 @@
 $(document).ready(function() {
+	/* tooltips */
+	$('[rel=tooltip]').tooltip();
+	/* popovers */
+	$('[rel=popover]').popover();
 	/* navigation */
 	$('#navigation_autocomplete').yourlabsAutocomplete({
 		url: '/navigation/',
