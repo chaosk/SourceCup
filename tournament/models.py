@@ -318,6 +318,9 @@ class Team(models.Model):
 
 	entry_code = models.CharField(max_length=25, blank=True)
 
+	class Meta:
+		get_latest_by = 'created_at'
+
 	def get_absolute_url(self):
 		return reverse('team_details', args=[self.pk])
 
@@ -326,6 +329,13 @@ class Team(models.Model):
 		# @TODO Leave all ongoing tournaments the moment a team disbands
 		self.is_active = False
 		self.save()
+
+	def save(self, *args, **kwargs):
+		created = not self.id
+		super().save(*args, **kwargs)
+		if created:
+			membership = Membership(team=self, player=self.leader)
+			membership.save()
 
 	def __str__(self):
 		return self.name
@@ -446,7 +456,7 @@ class TeamEntrySnapshot(models.Model):
 class Membership(models.Model):
 	player = models.ForeignKey(settings.AUTH_USER_MODEL)
 	team = models.ForeignKey(Team)
-	joined_at = models.DateTimeField(null=True, blank=True)
+	joined_at = models.DateTimeField(auto_now_add=True)
 	left_at = models.DateTimeField(null=True, blank=True)
 
 	class Meta:
@@ -462,11 +472,11 @@ class Membership(models.Model):
 		created = not self.id
 		if created:
 			try:
-				previous_team = self.player.teams.latest()
-			except Team.DoesNotExit:
+				previous_membership = self.player.membership_set.latest()
+			except Membership.DoesNotExist:
 				pass
 			else:
-				previous_team.membership.leave()
+				previous_membership.leave()
 		super().save(*args, **kwargs)
 
 	def __str__(self):

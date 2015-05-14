@@ -100,6 +100,7 @@
 									<th>Player</th>
 									<th>SteamID</th>
 									<th>Joined at</th>
+									<th>Left at</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -108,6 +109,7 @@
 									<td><a href="{{ membership.player.get_absolute_url }}">{{ membership.player }}</a></td>
 									<td>{{ membership.player.steamid }}</td>
 									<td>{{ membership.joined_at }}</td>
+									<td>{{ membership.left_at }}</td>
 								</tr>
 								{% endfor %}
 							</tbody>

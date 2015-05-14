@@ -2,6 +2,8 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
+from steamauth.utils import HttpResponseReload
+from .forms import TeamCreateForm
 from .models import Tournament, Round, Team, Membership, Season, TeamEntry
 
 
@@ -134,7 +136,24 @@ def team_edit(request, team_id):
 
 @login_required
 def team_create(request):
-	...
+	if request.user.current_team:
+		messages.warning(request, "You can't create a team while being in one already.")
+		return HttpResponseReload(request)
+
+	form = TeamCreateForm()
+
+	if request.method == 'POST':
+		form = TeamCreateForm(request.POST)
+		if form.is_valid():
+			team = form.save(commit=False)
+			team.leader = request.user
+			team.save()
+			messages.success(request, "Your team has been created")
+			return redirect(team.get_absolute_url())
+
+	return render(request, 'tournament/team_create.html', {
+		'form': form,
+	})
 
 
 @login_required
