@@ -125,6 +125,8 @@ class SteamUser(AbstractBaseUser):
 	def is_hero(self):
 		return self.level >= SteamUser.LEVEL_JUSTAHERO
 
+	is_superuser = is_hero
+
 	@property
 	def persona_state(self):
 		return cache.get('user_{0}_state'.format(self.steamid))
@@ -155,7 +157,7 @@ class SteamUser(AbstractBaseUser):
 
 	def to_steamid32(self):
 		return "STEAM_0:{0}:{1}".format(
-			self.steamid % 2, (self.steamid-STEAMID_MAGIC)/2)
+			self.steamid % 2, (self.steamid-STEAMID_MAGIC)//2)
 
 
 class Nonce(models.Model):

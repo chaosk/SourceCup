@@ -5,4 +5,5 @@ python3-openid
 django-autocomplete-light
 django-compressor
 django-gitrevision
+django-hijack
 linaro-django-pagination

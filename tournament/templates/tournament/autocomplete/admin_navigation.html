@@ -1,0 +1,28 @@
+{% if not teams_user and not users and not players and not tts_player %}
+<span class="div choice-header">Couldn't find anything helpful.</span>
+{% else %}
+{% if teams_user %}
+<span class="div choice-header">Teams (by name/leader)</span>
+{% for team in teams_user %}
+<a class="div choice" href="{{ team.get_absolute_url }}">{{ team }}<br><span class="muted">{{ team.leader }}</span></a>
+{% endfor %}
+{% endif %}
+{% if users %}
+<span class="div choice-header">Users</span>
+{% for auser in users %}
+<a class="div choice" href="{{ auser.get_absolute_url }}">{{ auser }}<br><span class="muted">{{ auser.steamid32 }}</span></a>
+{% endfor %}
+{% endif %}
+{% if players %}
+<span class="div choice-header">Players</span>
+{% for player in players %}
+<a class="div choice" href="{{ player.get_absolute_url }}">{{ player }}<br><span class="muted">{{ player.steamid }}</span></a>
+{% endfor %}
+{% endif %}
+{% if tts_player %}
+<span class="div choice-header">Teams (by exact player)</span>
+{% for tt in tts_player %}
+<a class="div choice" href="{{ tt.team.get_absolute_url }}">{{ tt.team }}<br><span class="muted">Played {{ tt.played_matches }} match{{ tt.played_matches|pluralize:"es" }} with/against</span></a>
+{% endfor %}
+{% endif %}
+{% endif %}

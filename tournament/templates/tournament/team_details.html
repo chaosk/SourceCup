@@ -11,7 +11,7 @@
 							{% endif %}
 							{% if user == team.leader %}
 							<a href="{% url 'team_disband' team.id %}" class="btn">Disband team</a>
-							<a href="{% url 'team_edit' team.id %}" class="btn">Modify details</a>
+							{# <a href="{% url 'team_edit' team.id %}" class="btn">Modify details</a> #}
 							{% endif %}
 							{% if not user.current_team %}
 							<a href="{% url 'team_join' team.id %}">Join team</a>
@@ -25,6 +25,10 @@
 							<dd>{{ team.created_at }}</dd>
 							<dt>Leader</dt>
 							<dd><a href="{{ team.leader.get_absolute_url }}">{{ team.leader }}</a></dd>
+							{% if user == team.leader %}
+							<dt>Entry code</dt>
+							<dd>{% if team.entry_code %}{{ team.entry_code }}{% else %}<a href="{% url 'team_new_entry_code' team.pk %}">Generate new entry code</a>{% endif %}</dd>
+							{% endif %}
 						</dl>
 					</div>
 					<h4>Tournaments</h4>
@@ -42,7 +46,6 @@
 								<th>Loss</th>
 								<th rel="tooltip" title="Match points for">Mp+</th>
 								<th rel="tooltip" title="Match points against">Mp-</th>
-							</tr>
 							</tr>
 						</thead>
 						<tbody>
@@ -92,7 +95,7 @@
 					</table>
 					{% endfor %}
 
-					<h4>Players</h4>
+					<h4>Players history</h4>
 					<div class="col-md-12">
 						<table class="table table-bordered">
 							<thead>
@@ -106,10 +109,14 @@
 							<tbody>
 								{% for membership in team.membership_set.all %}
 								<tr>
-									<td><a href="{{ membership.player.get_absolute_url }}">{{ membership.player }}</a></td>
+									<td>
+										{% if not membership.left_at %}<b>{% endif %}
+										<a href="{{ membership.player.get_absolute_url }}">{{ membership.player }}</a>
+										{% if not membership.left_at %}</b>{% endif %}
+									</td>
 									<td>{{ membership.player.steamid }}</td>
 									<td>{{ membership.joined_at }}</td>
-									<td>{{ membership.left_at }}</td>
+									<td>{{ membership.left_at|default_if_none:"-" }}</td>
 								</tr>
 								{% endfor %}
 							</tbody>

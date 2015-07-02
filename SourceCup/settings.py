@@ -40,6 +40,7 @@ INSTALLED_APPS = (
     'compressor',
     'autocomplete_light',
     'gitrevision',
+    'hijack',
 )
 
 OUR_APPS = (
@@ -138,3 +139,6 @@ STEAM_PROVIDER_URL = "http://steamcommunity.com/openid"
 LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/signin/'
 LOGOUT_URL  = '/bye/'
+
+ALLOWED_HIJACKING_USER_ATTRIBUTES = ('user_id', )
+SHOW_HIJACKUSER_IN_ADMIN = False

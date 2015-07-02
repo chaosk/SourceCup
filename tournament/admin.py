@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import TournamentBase, Season, Tournament, Region, GameServer
+from .models import TournamentBase, Season, Tournament, Region
 from .models import Team, TeamEntry, Round
 
 
@@ -47,11 +47,6 @@ class TournamentAdmin(admin.ModelAdmin):
 @admin.register(Region)
 class RegionAdmin(admin.ModelAdmin):
 	pass
-
-
-@admin.register(GameServer)
-class GameServerAdmin(admin.ModelAdmin):
-	list_filter = ['region', 'last_heartbeat']
 
 
 class MemberInline(admin.TabularInline):

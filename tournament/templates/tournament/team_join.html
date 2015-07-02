@@ -1,0 +1,13 @@
+{% extends 'tournament/team_list.html' %}
+{% block title %}{{ team }} &gt; {{ block.super }}{% endblock %}
+{% load round_name from tournament_utils %}
+{% block content %}
+				<div class="col-md-12">
+					<div class="row">
+						<form method="POST">{% csrf_token %}
+							Entry code: <input name="token">
+							<input type="submit">
+						</form>
+					</div>
+				</div>
+{% endblock %}

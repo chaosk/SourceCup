@@ -1,4 +1,5 @@
-import uuid
+import string
+import random
 from datetime import datetime, timedelta
 from django.utils import timezone
 from django.conf import settings
@@ -268,7 +269,6 @@ class Match(models.Model):
 		through_fields=('match', 'team_entry'), related_name='matches')
 	winner_team_entry = models.ForeignKey('TeamEntry', related_name='won_matches',
 		null=True, blank=True)
-	gameserver = models.ForeignKey('GameServer', null=True, blank=True)
 
 	STATUS_SCHEDULED = 'S'
 	STATUS_REPORTED = 'R'
@@ -330,6 +330,10 @@ class Team(models.Model):
 		self.is_active = False
 		self.save()
 
+	def generate_code(self):
+		self.entry_code = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(25))
+		self.save()
+
 	def save(self, *args, **kwargs):
 		created = not self.id
 		super().save(*args, **kwargs)
@@ -377,7 +381,7 @@ class TeamEntry(models.Model):
 
 	@property
 	def ladder_points(self):
-		return self.ladder_points_won - self.ladder_points_lost
+		return self.ladder_points_won() - self.ladder_points_lost()
 
 	def ladder_points_won(self):
 		return self.results.filter(
@@ -391,7 +395,7 @@ class TeamEntry(models.Model):
 
 	@property
 	def match_points(self):
-		return self.match_points_won - self.match_points_lost
+		return self.match_points_won() - self.match_points_lost()
 
 	def match_points_won(self):
 		return self.results.filter(
@@ -482,15 +486,3 @@ class Membership(models.Model):
 	def __str__(self):
 		return "{} of {}".format(self.player, self.team)
 
-
-class GameServer(models.Model):
-	# Source does not support IPv6, but who cares
-	address = models.GenericIPAddressField()
-	port = models.PositiveSmallIntegerField(validators=[MinValueValidator(0),
-		MaxValueValidator(65535)])
-	api_key = models.UUIDField(default=uuid.uuid4)
-	last_heartbeat = models.DateTimeField(null=True, blank=True)
-	region = models.ForeignKey(Region, blank=True, null=True)
-
-	def __str__(self):
-		return "{}:{}".format(self.address, self.port)

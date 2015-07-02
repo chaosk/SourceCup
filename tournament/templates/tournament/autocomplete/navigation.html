@@ -1,0 +1,8 @@
+{% if not teams_user %}
+<span class="div choice-header">Couldn't find anything helpful.</span>
+{% else %}
+<span class="div choice-header">Teams</span>
+{% for team in teams_user %}
+<a class="div choice" href="{{ team.get_absolute_url }}">{{ team }}<br><span class="muted">{{ team.leader }}</span></a>
+{% endfor %}
+{% endif %}

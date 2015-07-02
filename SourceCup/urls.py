@@ -10,6 +10,7 @@ urlpatterns = [
 	url(r'', include('tournament.urls')),
 	url(r'^$', home, name='home'),
 
+	url(r'^hijack/', include('hijack.urls')),
 	url(r'^autocomplete/', include('autocomplete_light.urls')),
 	url(r'^admin/', include(admin.site.urls)),
 ]

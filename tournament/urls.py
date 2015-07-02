@@ -15,7 +15,9 @@ urlpatterns = [
 	url(r'^team/(?P<team_id>\d+)/$', views.team_details, name='team_details'),
 	url(r'^team/(?P<team_id>\d+)/leave/$', views.team_leave, name='team_leave'),
 	url(r'^team/(?P<team_id>\d+)/disband/$', views.team_disband, name='team_disband'),
+	url(r'^team/(?P<team_id>\d+)/newcode/$', views.team_new_entry_code, name='team_new_entry_code'),
 	url(r'^team/(?P<team_id>\d+)/modify/$', views.team_edit, name='team_edit'),
 	url(r'^team/(?P<team_id>\d+)/join/$', views.team_join, name='team_join'),
 	url(r'^team/\+/$', views.team_create, name='team_create'),
+	url(r'^navigation/$', views.navigation_autocomplete, name='navigation'),
 ]

@@ -1,5 +1,6 @@
 {% load compress %}
 {% load static %}
+{% load hijack_tags %}
 {% load current from navigation %}
 <!DOCTYPE html>
 <html lang="en">
@@ -12,6 +13,7 @@
 		<link href="{% static 'SourceCup/css/bootstrap.min.css' %}" rel="stylesheet">
 		<link href="{% static 'SourceCup/css/bootstrap-theme.min.css' %}" rel="stylesheet">
 		<link href="{% static 'SourceCup/css/SourceCup.css' %}" rel="stylesheet">
+		<link rel="stylesheet" type="text/css" href="{% static 'hijack/hijack-styles.css' %}" />.
 		<link rel="stylesheet" type="text/css" href="{% static 'autocomplete_light/style.css' %}" />
 		{% endcompress %}
 
@@ -21,7 +23,7 @@
 		<![endif]-->
 	</head>
 
-	<body id="{% block bodyid %}default{% endblock %}">
+	<body id="{% block bodyid %}default{% endblock %}">{{ request|hijackNotification }}
 		<nav class="navbar navbar-inverse navbar-fixed-top">
 			<div class="container">
 				<div class="navbar-header">

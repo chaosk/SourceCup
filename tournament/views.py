@@ -1,10 +1,12 @@
 from django.core.urlresolvers import reverse
+from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from steamauth.utils import HttpResponseReload
 from .forms import TeamCreateForm
-from .models import Tournament, Round, Team, Membership, Season, TeamEntry
+from .models import Tournament, Round, Team, Membership, Season, TeamEntry, Match
 
 
 def tournament_list(request):
@@ -95,8 +97,8 @@ def team_leave(request, team_id):
 		membership.leave()
 		return redirect(team.get_absolute_url())
 
-	return render(request, 'tournament/team_leave.html', {
-		'team': team,
+	return render(request, 'generic_confirmation.html', {
+		'confirmation_message': "Are you sure you want to leave {}?".format(team)
 	})
 
 
@@ -115,6 +117,14 @@ def team_disband(request, team_id):
 		'confirmation_message': "Are you sure you want to disband {}?"
 		" There won't be a way to restore it.".format(team),
 	})
+
+
+@login_required
+def team_new_entry_code(request, team_id):
+	team = get_object_or_404(Team, pk=team_id, leader=request.user)
+	team.generate_code()
+	messages.success(request, 'New entry code has been generated')
+	return redirect(team.get_absolute_url())
 
 
 @login_required
@@ -158,4 +168,41 @@ def team_create(request):
 
 @login_required
 def team_join(request, team_id):
-	...
+	team = get_object_or_404(Team, pk=team_id)
+	if request.method == 'POST':
+		if team.entry_code and request.POST.get('token') == team.entry_code:
+			m = Membership(player=request.user, team=team)
+			m.save()
+			team.entry_code = ''
+			team.save()
+			messages.success(request, "You're now a member of {}".format(team))
+			return redirect(team.get_absolute_url())
+		else:
+			messages.error(request, 'Invalid entry code')
+	return render(request, 'tournament/team_join.html', {
+		'team': team,
+	})
+
+
+@login_required
+def navigation_autocomplete(request):
+	q = request.GET.get('q', '')
+	context = {'q': q}
+
+	queries = {}
+	queries['teams_user'] = Team.objects.filter(
+		Q(name__icontains=q) |
+		Q(leader__username__icontains=q)
+	).filter(is_active=True)[:3]
+	if request.user.is_staff:
+		queries['users'] = get_user_model().objects.filter(
+			Q(username__icontains=q) |
+			Q(steamid__icontains=q)
+		).distinct()[:3]
+
+	context.update(queries)
+
+	template_name = 'tournament/autocomplete/admin_navigation.html' \
+		if request.user.is_staff else 'tournament/autocomplete/navigation.html'
+
+	return render(request, template_name, context)

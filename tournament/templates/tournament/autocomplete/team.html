@@ -1,0 +1,3 @@
+<div data-value="{{ choice.pk }}">
+	{{ choice }} <a href="{% url 'team_details' choice.pk %}">&rarr;</a> <span class="muted">{{ choice.leader }} <a href="{% url 'user_details' choice.leader.steamid %}">&rarr;</a></span>
+</div>
