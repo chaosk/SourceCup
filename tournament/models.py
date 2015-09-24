@@ -270,7 +270,7 @@ class Round(models.Model):
 				break
 			opponents = first.opponents.all()
 			for i in range(len(teams)):
-				if teams[i].team in opponents:
+				if teams[i] in opponents:
 					continue
 				second = teams.pop(i)
 				match = Match.objects.create(
@@ -281,7 +281,7 @@ class Round(models.Model):
 						match=match,
 						team_entry=team,
 						opponent=opponent)
-					team.opponents.add(opponent.team)
+					team.opponents.add(opponent)
 				break
 		self.is_scheduled = True
 		self.save()
