@@ -6,7 +6,7 @@ from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 from steamauth.utils import HttpResponseReload
 from .forms import TeamCreateForm
-from .models import Tournament, Round, Team, Membership, Season, TeamEntry, Match
+from .models import Tournament, Round, Team, Membership, Season, TeamEntry, Match, MatchResult
 
 
 def tournament_list(request):
