@@ -245,7 +245,50 @@ class Round(models.Model):
 		return "Round {0}".format(self.number)
 
 	def generate_pairs(self):
-		...
+		getattr(self, 'generate_pairs_{}'.format(
+			'ladder' if self.round_type == Round.ROUND_TYPE_LADDER
+			else 'playoff'))()
+
+	def generate_pairs_ladder(self):
+		teams = list(TeamEntry.objects.filter(
+			tournament=self.tournament).exclude(is_suspended=True))
+		while teams:
+			first = teams.pop(0)
+			if not len(teams):
+				# a bye
+				match = Match.objects.create(
+					round=self,
+					home_team_entry=first,
+					winner_team_entry=first,
+					status=Match.STATUS_BYE)
+				result = MatchResult.objects.create(
+					match=match,
+					team_entry=first,
+					is_defaultwin=True,
+					score=1,
+					opponents_score=0)
+				break
+			opponents = first.opponents.all()
+			for i in range(len(teams)):
+				if teams[i].team in opponents:
+					continue
+				second = teams.pop(i)
+				match = Match.objects.create(
+					round=self,
+					home_team_entry=first)
+				for team, opponent in ((first, second), (second, first)):
+					MatchResult.objects.create(
+						match=match,
+						team_entry=team,
+						opponent=opponent)
+					team.opponents.add(opponent.team)
+				break
+		self.is_scheduled = True
+		self.save()
+
+
+	def generate_pairs_playoff(self):
+		raise NotImplementedError
 
 	def save(self, *args, **kwargs):
 		created = not self.id
