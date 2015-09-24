@@ -429,12 +429,12 @@ class TeamEntry(models.Model):
 	def ladder_points_won(self):
 		return self.results.filter(
 			match__status__in=(Match.STATUS_ACCEPTED, Match.STATUS_RESOLVED,
-				Match.STATUS_BYE, Match.STATUS_DEFAULTLOSS)).filter().count()
+				Match.STATUS_BYE, Match.STATUS_DEFAULTLOSS)).filter(score_gt=F('opponents_score')).count()
 
 	def ladder_points_lost(self):
 		return self.results.filter(
 			match__status__in=(Match.STATUS_ACCEPTED, Match.STATUS_RESOLVED,
-				Match.STATUS_BYE, Match.STATUS_DEFAULTLOSS)).filter().count()
+				Match.STATUS_BYE, Match.STATUS_DEFAULTLOSS)).filter(score_lt=F('opponents_score')).count()
 
 	@property
 	def match_points(self):
