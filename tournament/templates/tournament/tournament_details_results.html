@@ -27,7 +27,7 @@
 							</tr>
 							{% for result in state.list %}
 							<tr>
-								<td>{{ result.tt.team }}</td>
+								<td>{{ result.team_entry.team }}</td>
 								{% if result.match.status == result.match.STATUS_ACCEPTED or result.match.status == result.match.STATUS_RESOLVED %}
 								<td>{{ result.score }}</td>
 								<td>{{ result.opponents_score }}</td>
